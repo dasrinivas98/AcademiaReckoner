@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import { TextInput } from 'react-native-paper';
 import { BackgroundImage } from 'react-native-elements/dist/config';
+import Toast from 'react-native-simple-toast';
 
 export default function UserBio({sem}) {
   const [data, setData] = useState({
@@ -14,10 +15,27 @@ export default function UserBio({sem}) {
  })
  const [disable, setDisable] = useState(true);
  let  enable = async() =>{
-  setDisable(!disable)
+  //setDisable(!disable)
   if(!disable){
     console.log("New values are : "+ data.name + data.college + data.usn + data.university)
-  }
+    const name = ["name", data.name]
+      const usn = ["usn", data.usn]
+      const college = ["college", data.college]
+      const university = ["university", data.university]
+      try {
+        await AsyncStorage.multiSet([name, usn,college,university])
+        console.log("Updated")
+        setDisable(!disable)
+        Toast.show('Details updated sucessfully');
+      } catch(e) {
+        console.log("unable to save"+e)
+        Toast.show('Failed to update details');
+        setDisable(!disable)
+      }
+    }else{
+      setDisable(!disable)
+    }
+  
     //setDisable(!disable)
     // const newdData = {
     //   name: data.name,
@@ -66,6 +84,7 @@ export default function UserBio({sem}) {
         });
    
   }
+  
   //console.log(data);
   useEffect(() => {
    getData();
@@ -94,7 +113,7 @@ export default function UserBio({sem}) {
         <TextInput
         // label="Name"
         value={data.name}
-        onChangeText={text => setData(data.name = text)}
+        onChangeText={(text) => {setData({...data,name:text})}}
         mode='flat'
         disabled={disable}
         style={{backgroundColor: 'black'}}
@@ -113,7 +132,7 @@ export default function UserBio({sem}) {
         <TextInput
        // label="USN"
         value={data.usn}
-        onChangeText={text => setData(data.usn = text)}
+        onChangeText={(text) => {setData({...data,usn:text})}}
         mode='flat'
         disabled={disable}
         style={{backgroundColor: 'black'}}
@@ -131,7 +150,7 @@ export default function UserBio({sem}) {
         <TextInput
         //label="College"
         value={data.college}
-        onChangeText={text => setData(data.college = text)}
+        onChangeText={(text) => {setData({...data,college:text})}}
         mode='flat'
         disabled={disable}
         style={{backgroundColor: 'black'}}
@@ -149,7 +168,7 @@ export default function UserBio({sem}) {
         <TextInput
         //label="University"
         value={data.university}
-        onChangeText={text => setData(data.university = text)}
+        onChangeText={(text) => {setData({...data,university:text})}}
         mode='flat'
         disabled={disable}
         style={{backgroundColor: 'black'}}
