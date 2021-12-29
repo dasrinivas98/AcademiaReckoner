@@ -32,6 +32,7 @@ export default function addPostScreen() {
     textInput1.push(<View style={{marginBottom: 5}}key={i}>
       <Text style={{color: 'white'}}>Subject {i+1}</Text>
         <TextInput
+        key={i}
         mode='flat'
         style={{backgroundColor: 'black'}}
         activeOutlineColor='white'
@@ -43,12 +44,14 @@ export default function addPostScreen() {
       />
       <Text style={{color: 'white',marginTop:10}}>Credits Assigned</Text>
       <NumericInput
+        key={i}
         totalWidth={240} 
         totalHeight={50}
           onChange={value => console.log(value)} rounded textColor='#59656F' iconStyle={{ color: '#59656F' }} rightButtonBackgroundColor='#292d3e' leftButtonBackgroundColor='#292d3e' minValue={1}
           maxValue={10}/>
       <Text style={{color: 'white',marginTop:10}}>Marks Obtained</Text>
         <TextInput
+        key={i}
         mode='flat'
         keyboardType='numeric'
         style={{backgroundColor: 'black'}}
