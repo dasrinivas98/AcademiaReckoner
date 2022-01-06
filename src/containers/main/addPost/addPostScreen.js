@@ -7,7 +7,9 @@ import NumericInput from 'react-native-numeric-input-counter';
 import Modal from "react-native-modal";
 import { TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-export default function addPostScreen() {
+import Toast from 'react-native-simple-toast';
+import { NavigationContainer } from '@react-navigation/native';
+export default function addPostScreen({navigation}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -120,9 +122,13 @@ const updateCredits = (index, value) => {
   try {
     const jsonValue = JSON.stringify(userInputs)
     await AsyncStorage.setItem(value, jsonValue)
+    Toast.show("Saved successfully");
+    navigation.navigate('Home');
   } catch(e) {
     console.log(e);
+    Toast.show("Failed to save");
   }
+  
   let va
       try {
         va = await AsyncStorage.getItem('5');
@@ -148,11 +154,11 @@ const updateCredits = (index, value) => {
     // read error
   }
   console.log(valu[0])
-  // try {
-  //   await AsyncStorage.clear()
-  // } catch(e) {
-  //   // clear error
-  // }
+  try {
+    await AsyncStorage.clear()
+  } catch(e) {
+    // clear error
+  }
 
   console.log('Done.')
 

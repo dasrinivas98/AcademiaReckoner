@@ -65,6 +65,7 @@ export default function UserBio({sem}) {
    
  }
   const getData = async () => {
+    console.log("heksjfb");
     let value
     try {
       nm = await AsyncStorage.getItem('name');

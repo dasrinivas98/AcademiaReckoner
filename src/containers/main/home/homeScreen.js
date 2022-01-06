@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect,useState} from 'react';
 import {FlatList, View} from 'react-native';
 import Post from './post/Post';
 import colors from '../../../res/colors';
@@ -7,11 +7,14 @@ import {Image} from 'react-native';
 import images from 'res/images';
 import StoryContainer from './story/StoryContainer';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
+import { useIsFocused } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
   const data = [{key: '1'},{key: '2'}];
   const semdata = [{sem:"1",cgpa:'7.8'},{sem:'2',cgpa:'7.3'},{sem:'3',cgpa:'7.6'},{sem:'4',cgpa:'7.1'}]
   const it = [1,2,3,4]
 export default function homeScreen({navigation}) {
+  const isFocused = useIsFocused();
   // const data = [
   //   {key: '1'},
   //   {key: '2'},
@@ -27,7 +30,15 @@ export default function homeScreen({navigation}) {
   
 
   const storyOnPress = () => navigation.navigate('StoryScreen');
-
+  const func = async() => {
+    let keys = []
+    try {
+      keys = await AsyncStorage.getAllKeys();
+      console.log("Semesters: " +keys.length)
+    } catch(e) {
+      console.log(e);
+    }
+  }
   const post = {
     userName: 'John Doe',
     placeName: 'Istanbul, Turkey',
@@ -70,7 +81,10 @@ export default function homeScreen({navigation}) {
       src: 'https://picsum.photos/600',
     },
   ];
-
+  useEffect(() => {
+    func();
+     
+   }, [isFocused]);
   return (
     
     <FlatList
