@@ -6,25 +6,26 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import NumericInput from 'react-native-numeric-input-counter';
 import Modal from "react-native-modal";
 import { TextInput } from 'react-native-paper';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function addPostScreen() {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
   const [subCount,setSubCount] = useState(0);
   const [textInput,setTextInput] = useState([]);
   const [marks,setMarks] = useState(0);
   const [sub,setSub] = useState("");
-  const [userInputs,setUserInputs] = useState([{"sub":"","marks":0,"credits":0}])
+  //const [userInputs,setUserInputs] = useState([{"sub":"","marks":0,"credits":0}]);
+  const [userInputs,setUserInputs] = useState([{"sub":"","marks":0,"credits":0}]);
   const [items, setItems] = useState([
-    {label: 1, value: 1},
-    {label: 2, value: 2},
-    {label: 3, value: 3},
-    {label: 4, value: 4},
-    {label: 5, value: 5},
-    {label: 6, value: 6},
-    {label: 7, value: 7},
-    {label: 8, value: 8},
+    {label: 1, value: "1"},
+    {label: 2, value: "2"},
+    {label: 3, value: "3"},
+    {label: 4, value: "4"},
+    {label: 5, value: "5"},
+    {label: 6, value: "6"},
+    {label: 7, value: "7"},
+    {label: 8, value: "8"},
 
   ]);
   updateState = (index,k,value) => {
@@ -113,10 +114,50 @@ const updateCredits = (index, value) => {
     setTextInput(textInput1);
     setModalVisible(!isModalVisible);
   };
-  const saveMarks = () => {
+  const saveMarks = async () => {
+    console.log(value);
     console.log(userInputs);
-    setModalVisible(!isModalVisible);
+  try {
+    const jsonValue = JSON.stringify(userInputs)
+    await AsyncStorage.setItem(value, jsonValue)
+  } catch(e) {
+    console.log(e);
   }
+  let va
+      try {
+        va = await AsyncStorage.getItem('5');
+        let arrayData = JSON.parse(va);
+        console.log(va);
+      } catch(e) {
+        console.log(e);
+      }
+      console.log("stored values are "+va);
+      setModalVisible(!isModalVisible);
+      console.log('Saved succesfully'); 
+      let keys = []
+  try {
+    keys = await AsyncStorage.getAllKeys();
+    console.log(keys)
+  } catch(e) {
+    console.log(e);
+  }
+  let valu
+  try {
+    valu = await AsyncStorage.multiGet(keys)
+  } catch(e) {
+    // read error
+  }
+  console.log(valu[0])
+  // try {
+  //   await AsyncStorage.clear()
+  // } catch(e) {
+  //   // clear error
+  // }
+
+  console.log('Done.')
+
+}
+
 
   return (
     <View style={{flex: 1, backgroundColor: colors.bottomBackGround}}>
