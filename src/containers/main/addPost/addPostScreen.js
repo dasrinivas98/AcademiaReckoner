@@ -9,6 +9,7 @@ import { TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-simple-toast';
 import { NavigationContainer } from '@react-navigation/native';
+import { mark } from 'regenerator-runtime';
 export default function addPostScreen({navigation}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
@@ -116,6 +117,24 @@ const updateCredits = (index, value) => {
     setTextInput(textInput1);
     setModalVisible(!isModalVisible);
   };
+  const getGradePoint = (marks) =>{
+    if(marks>=0 && marks<50){
+      return 0;
+    }else if(marks>=50 && marks<55){
+      return 4;
+    }else if(marks>=55 && marks<60){
+      return 6;
+    }else if(marks>=60 && marks<70){
+      return 7;
+    }else if(marks>=70 && marks<80){
+      return 8;
+    }else if(marks>=80 && marks<90){
+      return 9;
+    }else{
+      return 10;
+    }
+
+  }
   const saveMarks = async () => {
     console.log(value);
     console.log(userInputs);
@@ -157,15 +176,21 @@ const updateCredits = (index, value) => {
   vf = valu[0].map(req => JSON.parse(req));
   let sum = 0;
   //console.log(vf[1][0].marks);
-  sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
-  console.log("Total marks is :"+sum);
-  const total = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
-  console.log("Total marks is :"+total);
-  try {
-    await AsyncStorage.clear()
-  } catch(e) {
-    // clear error
-  }
+  // sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
+  // console.log("Total marks is :"+sum);
+  const totalMarks = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
+  const totalCredits = vf[1].reduce((prev,next) => prev + parseInt(next.credits),0);
+  const totalCP = vf[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
+  console.log("Total marks in addpost screen is :"+totalMarks);
+  console.log("Total credits in addpost screen is :"+totalCredits);
+  console.log("Total CP in addpost screen is :"+totalCP);
+  console.log("CGPA in addpost screen is :"+(totalCP/totalCredits).toFixed(2));
+  //console.log("CGPA in addpost screen is :"+(((totalMarks/vf[1].length)+0.75)/10.0));
+  // try {
+  //   await AsyncStorage.clear()
+  // } catch(e) {
+  //   console.log(e);
+  // }
 
   console.log('Done.')
 

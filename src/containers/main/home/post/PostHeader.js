@@ -32,7 +32,7 @@ export default function PostHeader({sem}) {
             price={sem.cgpa+"/10"}
             image={images.background}
             buttonText={"VIEW DETAILS"}
-            buttonColor={"purple"}
+            buttonColor={"red"}
             onClickButton={() => console.log("this")}
           />
   );

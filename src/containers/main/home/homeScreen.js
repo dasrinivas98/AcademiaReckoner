@@ -9,45 +9,98 @@ import StoryContainer from './story/StoryContainer';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoaderKit from 'react-native-loader-kit';
+
 
   const data = [{key: '1'},{key: '2'}];
   const semdata = [{sem:"1",cgpa:'7.8'},{sem:'2',cgpa:'7.3'},{sem:'3',cgpa:'7.6'},{sem:'4',cgpa:'7.1'}]
+  
   const it = [1,2,3,4]
 export default function homeScreen({navigation}) {
+  const [finalData,setFinalData] = useState([{sem:'',cgpa:0,per:0}]);
   const [isDataAvailable, setDataAvailable] = useState(false);
+  const [loadingScreeen, setLoadingScreen] = useState(true);
   const isFocused = useIsFocused();
-  // const data = [
-  //   {key: '1'},
-  //   {key: '2'},
-  //   {key: '3'},
-  //   {key: '4'},
-  //   {key: '5'},
-  //   {key: '6'},
-  //   {key: '7'},
-  //   {key: '8'},
-  //   {key: '9'},
-  //   {key: '10'},
-  // ];
-  
-
   const storyOnPress = () => navigation.navigate('StoryScreen');
-  const func = async() => {
+  const init = async() => {
+    setLoadingScreen(true);
     let keys = []
     try {
       keys = await AsyncStorage.getAllKeys();
-      console.log("Semesters: " +keys.length)
+      console.log("Semesters in homescreen: " +keys.length)
+      console.log("Keys in homescreen: " +keys)
     } catch(e) {
       console.log(e);
     }
     if(keys.length>0){
-      console.log("data is there");
-      const newArr = keys.map(myFunction);
-      function myFunction(num) {
-        return num * 10;
-      }
-      console.log(newArr)
+      console.log("data is available");
+      await FinalData(keys);
+      setDataAvailable(true);
+      setTimeout(() => {
+        setLoadingScreen(false);
+      }, 4000);
     }else{
+      setDataAvailable(false);
       console.log("no data");
+      setTimeout(() => {
+        setLoadingScreen(false);
+      }, 4000);
+    }
+    console.log(finalData);
+  }
+  const FinalData = async (keys) =>{
+    let AllMarksData = [];
+      AllMarksData = await getAllMarksData(keys);
+      parsedData = await parseAllMarksData(AllMarksData);
+      parsedData.map(pd => {
+      const totalMarks = pd[1].reduce((prev,next) => prev + parseInt(next.marks),0);
+      //console.log(totalMarks);
+      const totalCredits = pd[1].reduce((prev,next) => prev + parseInt(next.credits),0);
+      //console.log(totalCredits)
+      const totalCP = pd[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
+      //console.log(totalCP)
+      finalData[pd[0]-1] = {...finalData[pd[0]-1], ['sem']: (pd[0]).toString(),['per']:(totalMarks/pd[1].length).toFixed(2),['cgpa']:(totalCP/totalCredits).toFixed(2)};
+      });
+      // const totalMarks = parsedData.map(parsedData =>parsedData[1].reduce((prev,next) => prev + parseInt(next.marks),0));
+      // console.log(totalMarks);
+      // const totalCredits = parsedData.map(parsedData =>parsedData[1].reduce((prev,next) => prev + parseInt(next.credits),0));
+      // console.log(totalCredits)
+      // const totalCP = parsedData.map(parsedData =>parsedData[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0));
+      // console.log(totalCP)
+      // finalData[parsedData[0]-1] = {...finalData[parsedData[0]-1], ['sem']: (parsedData[0]),['per']:(totalMarks/parsedData[1].length).toFixed(2),['cgpa']:(totalCP/totalCredits).toFixed(2)};
+  }
+  const getAllMarksData = async(keys) =>{
+    let AllMarksData = []
+    try {
+      AllMarksData = await AsyncStorage.multiGet(keys);
+    } catch(e) {
+        console.log(e);
+    }
+    console.log("All marks data " +AllMarksData)
+    return(AllMarksData);
+  }
+  
+  const parseAllMarksData = (AllMarksData) => {
+    parsedData = AllMarksData.map(amd => amd.map(req => JSON.parse(req)));
+    //parsedData = AllMarksData[1].map((req => JSON.parse(req)));
+    console.log("parsed marks data " +parsedData)
+    return(parsedData);
+  }
+  const getGradePoint = (marks) =>{
+    if(marks>=0 && marks<50){
+      return 0;
+    }else if(marks>=50 && marks<55){
+      return 4;
+    }else if(marks>=55 && marks<60){
+      return 6;
+    }else if(marks>=60 && marks<70){
+      return 7;
+    }else if(marks>=70 && marks<80){
+      return 8;
+    }else if(marks>=80 && marks<90){
+      return 9;
+    }else{
+      return 10;
     }
   }
   const post = {
@@ -59,49 +112,26 @@ export default function homeScreen({navigation}) {
     text:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A diam maecenas sed enim ut sem viverra.',
     publishDate: new Date().toDateString(),
-  };
-  const stories = [
-    {
-      key: 'JohnDoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-    {
-      key: 'CarlaCoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-    {
-      key: 'DonnaDoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-    {
-      key: 'JuanDoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-    {
-      key: 'MartaMoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-    {
-      key: 'PaulaPoe',
-      hasStory: true,
-      src: 'https://picsum.photos/600',
-    },
-  ];
+  }
+  
   useEffect(() => {
-    func();
-     
+    init(); 
    }, [isFocused]);
-  return (
-    
-    <FlatList
+   return({},loadingScreeen ? (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center",backgroundColor:colors.bottomBackGround}}>
+        <LoaderKit
+        style={{ width: 100, height: 100 }}
+        name={'Pacman'} // Optional: see list of animations below
+        size={50} // Required on iOS
+        color={'red'} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+      />
+      <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>Please wait while the Pac-Man finishes all the dots..</Text>
+  </View>
+    ) : ({},isDataAvailable ? (
+      <FlatList
       style={{backgroundColor: colors.background}}
-      data={semdata}
-      keyExtractor={(item, index) => item.sem}
+      data={finalData}
+      keyExtractor={(item, index) => (item.sem)}
       // ListHeaderComponent={() => (
       //   <StoryContainer stories={stories} storyOnPress={storyOnPress} />
       // )}
@@ -116,5 +146,35 @@ export default function homeScreen({navigation}) {
         <Post sem={item} />
       )}
     />
-  );
+    ) : (
+      <View style={{flex: 1, backgroundColor: colors.bottomBackGround,justifyContent:'center'}}>
+        <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>Add Marks to get started</Text>
+      </View>
+    )))
+  // return ({},
+  //   isDataAvailable ? (
+  //   <FlatList
+  //     style={{backgroundColor: colors.background}}
+  //     data={finalData}
+  //     keyExtractor={(item, index) => item.sem}
+  //     // ListHeaderComponent={() => (
+  //     //   <StoryContainer stories={stories} storyOnPress={storyOnPress} />
+  //     // )}
+  //     renderItem={({item}) => (
+  //       /*<View style={{flex: 1, alignItems: 'center'}}>
+  //         <Image
+  //           source={images.harun}
+  //           style={{height: 512, width: 512, resizeMode: 'contain'}}
+  //         />
+  //       </View>
+  //       */
+  //       <Post sem={item} />
+  //     )}
+  //   />
+  // ) :(
+  //   <View style={{flex: 1, backgroundColor: colors.bottomBackGround,justifyContent:'center'}}>
+  //     <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>Add Marks to get started</Text>
+  //   </View>
+    
+  // ));
 }

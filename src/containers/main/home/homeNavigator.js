@@ -28,7 +28,7 @@ export default function () {
         options={({navigation}) => ({
           title: '',
           headerStyle: {
-            backgroundColor: '#000000',
+            backgroundColor: colors.bottomBackGround,
             shadowColor: colors.seperatorLineColor,
           },
           // headerLeft: () => (
