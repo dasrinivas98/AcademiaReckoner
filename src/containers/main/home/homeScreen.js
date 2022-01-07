@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
   const semdata = [{sem:"1",cgpa:'7.8'},{sem:'2',cgpa:'7.3'},{sem:'3',cgpa:'7.6'},{sem:'4',cgpa:'7.1'}]
   const it = [1,2,3,4]
 export default function homeScreen({navigation}) {
+  const [isDataAvailable, setDataAvailable] = useState(false);
   const isFocused = useIsFocused();
   // const data = [
   //   {key: '1'},
@@ -37,6 +38,16 @@ export default function homeScreen({navigation}) {
       console.log("Semesters: " +keys.length)
     } catch(e) {
       console.log(e);
+    }
+    if(keys.length>0){
+      console.log("data is there");
+      const newArr = keys.map(myFunction);
+      function myFunction(num) {
+        return num * 10;
+      }
+      console.log(newArr)
+    }else{
+      console.log("no data");
     }
   }
   const post = {

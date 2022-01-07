@@ -147,13 +147,20 @@ const updateCredits = (index, value) => {
   } catch(e) {
     console.log(e);
   }
-  let valu
+  let valu = []
   try {
-    valu = await AsyncStorage.multiGet(keys)
+    valu = await AsyncStorage.multiGet(keys);
   } catch(e) {
     // read error
   }
-  console.log(valu[0])
+  console.log((valu))
+  vf = valu[0].map(req => JSON.parse(req));
+  let sum = 0;
+  //console.log(vf[1][0].marks);
+  sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
+  console.log("Total marks is :"+sum);
+  const total = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
+  console.log("Total marks is :"+total);
   try {
     await AsyncStorage.clear()
   } catch(e) {
