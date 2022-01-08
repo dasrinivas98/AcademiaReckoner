@@ -16,13 +16,19 @@ import LoaderKit from 'react-native-loader-kit';
   const semdata = [{sem:"1",cgpa:'7.8'},{sem:'2',cgpa:'7.3'},{sem:'3',cgpa:'7.6'},{sem:'4',cgpa:'7.1'}]
   
   const it = [1,2,3,4]
+  let ic = true;
 export default function homeScreen({navigation}) {
-  const [finalData,setFinalData] = useState([{sem:'',cgpa:0,per:0}]);
+  const [finalData,setFinalData] = useState([{sem:'',sgpa:0,cgpa:0,per:0,tMarks:0,marks:[]}]);
   const [isDataAvailable, setDataAvailable] = useState(false);
   const [loadingScreeen, setLoadingScreen] = useState(true);
+  const [icon,setIcon] = useState(true);
   const isFocused = useIsFocused();
   const storyOnPress = () => navigation.navigate('StoryScreen');
   const init = async() => {
+   let x = Math.floor(Math.random() * 11);
+    if(x>=0 && x<5){
+      ic = !ic;
+    }
     setLoadingScreen(true);
     let keys = []
     try {
@@ -33,8 +39,13 @@ export default function homeScreen({navigation}) {
       console.log(e);
     }
     if(keys.length>0){
+      let keyarr = [];
+      for(let i=1;i<=keys.length-4;i++){
+        keyarr.push(i.toString());
+      }
+      console.log(keyarr);
       console.log("data is available");
-      await FinalData(keys);
+      await FinalData(keyarr);
       setDataAvailable(true);
       setTimeout(() => {
         setLoadingScreen(false);
@@ -46,21 +57,29 @@ export default function homeScreen({navigation}) {
         setLoadingScreen(false);
       }, 4000);
     }
+    // console.log(finalData[0].marks);
     console.log(finalData);
   }
   const FinalData = async (keys) =>{
     let AllMarksData = [];
       AllMarksData = await getAllMarksData(keys);
       parsedData = await parseAllMarksData(AllMarksData);
+      let creditsSum = 0;
+      let CPSum = 0;
       parsedData.map(pd => {
+        console.log(pd[1]);
       const totalMarks = pd[1].reduce((prev,next) => prev + parseInt(next.marks),0);
       //console.log(totalMarks);
       const totalCredits = pd[1].reduce((prev,next) => prev + parseInt(next.credits),0);
       //console.log(totalCredits)
       const totalCP = pd[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
+      creditsSum = creditsSum + totalCredits;
+      CPSum = CPSum + totalCP;
       //console.log(totalCP)
-      finalData[pd[0]-1] = {...finalData[pd[0]-1], ['sem']: (pd[0]).toString(),['per']:(totalMarks/pd[1].length).toFixed(2),['cgpa']:(totalCP/totalCredits).toFixed(2)};
+      finalData[pd[0]-1] = {...finalData[pd[0]-1], ['sem']: (pd[0]).toString(),['per']:(totalMarks/pd[1].length).toFixed(2),['sgpa']:(totalCP/totalCredits).toFixed(2),['cgpa']:(CPSum/creditsSum).toFixed(2),['tMarks']:totalMarks,['marks']:pd[1]};
       });
+      console.log("creditSum : "+creditsSum)
+      console.log("TotalCP : "+CPSum);
       // const totalMarks = parsedData.map(parsedData =>parsedData[1].reduce((prev,next) => prev + parseInt(next.marks),0));
       // console.log(totalMarks);
       // const totalCredits = parsedData.map(parsedData =>parsedData[1].reduce((prev,next) => prev + parseInt(next.credits),0));
@@ -70,6 +89,7 @@ export default function homeScreen({navigation}) {
       // finalData[parsedData[0]-1] = {...finalData[parsedData[0]-1], ['sem']: (parsedData[0]),['per']:(totalMarks/parsedData[1].length).toFixed(2),['cgpa']:(totalCP/totalCredits).toFixed(2)};
   }
   const getAllMarksData = async(keys) =>{
+    console.log(keys);
     let AllMarksData = []
     try {
       AllMarksData = await AsyncStorage.multiGet(keys);
@@ -115,18 +135,19 @@ export default function homeScreen({navigation}) {
   }
   
   useEffect(() => {
-    init(); 
+      init(); 
    }, [isFocused]);
+   
    return({},loadingScreeen ? (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center",backgroundColor:colors.bottomBackGround}}>
         <LoaderKit
         style={{ width: 100, height: 100 }}
-        name={'Pacman'} // Optional: see list of animations below
+        name={ic ? 'Pacman':'BallScaleMultiple'} // Optional: see list of animations below
         size={50} // Required on iOS
         color={'red'} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
       />
-      <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>Please wait while the Pac-Man finishes all the dots..</Text>
-  </View>
+      <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>{ic ? 'Please wait while the Pac-Man finishes all the dots..' : 'Everything in this universe is either a potato or not a potato..'}</Text>
+    </View>
     ) : ({},isDataAvailable ? (
       <FlatList
       style={{backgroundColor: colors.background}}
