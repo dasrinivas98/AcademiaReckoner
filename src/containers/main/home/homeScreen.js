@@ -25,8 +25,8 @@ import {
   
   const it = [1,2,3,4]
   let ic = true;
-  let chrtLbl = [0,0,0];
-  let chrtdata = [0,0,0];
+  let chrtLbl = [];
+  let chrtdata = [];
 export default function homeScreen({navigation}) {
   const [finalData,setFinalData] = useState([{sem:'',sgpa:0,cgpa:0,per:0,tMarks:0,marks:[]}]);
   const [isDataAvailable, setDataAvailable] = useState(false);
@@ -91,7 +91,7 @@ export default function homeScreen({navigation}) {
       CPSum = CPSum + totalCP;
       //console.log(totalCP)
       chrtLbl.push("Sem "+pd[0].toString());
-      chrtdata.push((totalCP/totalCredits).toFixed(2))
+      chrtdata.push((totalCP/totalCredits))
       finalData[pd[0]-1] = {...finalData[pd[0]-1], ['sem']: (pd[0]).toString(),['per']:(totalMarks/pd[1].length).toFixed(2),['sgpa']:(totalCP/totalCredits).toFixed(2),['cgpa']:(CPSum/creditsSum).toFixed(2),['tMarks']:totalMarks,['marks']:pd[1]};
       });
       console.log("creditSum : "+creditsSum)

@@ -14,7 +14,6 @@ import {
   StackedBarChart
 } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
-import RNRestart from 'react-native-restart';
 
 export default function UserBio({sem}) {
   const isFocused = useIsFocused();
@@ -88,10 +87,10 @@ export default function UserBio({sem}) {
     //console.log(" crct stored values are 55 "+value);
     setData({
       ...data,
-          name : nm.toUpperCase(),
-          usn : us.toUpperCase(),
-          college : col.toUpperCase(),
-          university : uni.toUpperCase()
+          name : nm,
+          usn : us,
+          college : col,
+          university : uni
         });
    
   }
