@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, View,Dimensions} from 'react-native';
 import Post from './post/Post';
 import colors from '../../../res/colors';
 import {Text} from 'react-native';
@@ -10,6 +10,14 @@ import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 
 import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderKit from 'react-native-loader-kit';
+import {
+  LineChart,
+  BarChart,
+  PieChart,
+  ProgressChart,
+  ContributionGraph,
+  StackedBarChart
+} from "react-native-chart-kit";
 
 
   const data = [{key: '1'},{key: '2'}];
@@ -17,11 +25,15 @@ import LoaderKit from 'react-native-loader-kit';
   
   const it = [1,2,3,4]
   let ic = true;
+  let chrtLbl = [0,0,0];
+  let chrtdata = [0,0,0];
 export default function homeScreen({navigation}) {
   const [finalData,setFinalData] = useState([{sem:'',sgpa:0,cgpa:0,per:0,tMarks:0,marks:[]}]);
   const [isDataAvailable, setDataAvailable] = useState(false);
   const [loadingScreeen, setLoadingScreen] = useState(true);
   const [icon,setIcon] = useState(true);
+  // const [chrtData,setChrtData] = [12,34,56]
+  // const [chrtLabel,setChrtLabel] = ['Sem 1','Sem 2','Sem 3']
   const isFocused = useIsFocused();
   const storyOnPress = () => navigation.navigate('StoryScreen');
   const init = async() => {
@@ -38,7 +50,7 @@ export default function homeScreen({navigation}) {
     } catch(e) {
       console.log(e);
     }
-    if(keys.length>0){
+    if(keys.length>4){
       let keyarr = [];
       for(let i=1;i<=keys.length-4;i++){
         keyarr.push(i.toString());
@@ -49,19 +61,21 @@ export default function homeScreen({navigation}) {
       setDataAvailable(true);
       setTimeout(() => {
         setLoadingScreen(false);
-      }, 4000);
+      }, 3000);
     }else{
       setDataAvailable(false);
       console.log("no data");
       setTimeout(() => {
         setLoadingScreen(false);
-      }, 4000);
+      }, 3000);
     }
     // console.log(finalData[0].marks);
     console.log(finalData);
   }
   const FinalData = async (keys) =>{
     let AllMarksData = [];
+    chrtdata = [],
+    chrtLbl = [],
       AllMarksData = await getAllMarksData(keys);
       parsedData = await parseAllMarksData(AllMarksData);
       let creditsSum = 0;
@@ -76,6 +90,8 @@ export default function homeScreen({navigation}) {
       creditsSum = creditsSum + totalCredits;
       CPSum = CPSum + totalCP;
       //console.log(totalCP)
+      chrtLbl.push("Sem "+pd[0].toString());
+      chrtdata.push((totalCP/totalCredits).toFixed(2))
       finalData[pd[0]-1] = {...finalData[pd[0]-1], ['sem']: (pd[0]).toString(),['per']:(totalMarks/pd[1].length).toFixed(2),['sgpa']:(totalCP/totalCredits).toFixed(2),['cgpa']:(CPSum/creditsSum).toFixed(2),['tMarks']:totalMarks,['marks']:pd[1]};
       });
       console.log("creditSum : "+creditsSum)
@@ -149,8 +165,9 @@ export default function homeScreen({navigation}) {
       <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>{ic ? 'Please wait while the Pac-Man finishes all the dots..' : 'Everything in this universe is either a potato or not a potato..'}</Text>
     </View>
     ) : ({},isDataAvailable ? (
+      <View flex={1} style={{ backgroundColor: colors.bottomBackGround}}>
       <FlatList
-      style={{backgroundColor: colors.background}}
+      style={{backgroundColor: colors.background,borderRadius: 16}}
       data={finalData}
       keyExtractor={(item, index) => (item.sem)}
       // ListHeaderComponent={() => (
@@ -167,6 +184,42 @@ export default function homeScreen({navigation}) {
         <Post sem={item} />
       )}
     />
+    <LineChart
+    data={{
+      labels: chrtLbl,
+      datasets: [
+        {
+          data: chrtdata
+        }
+      ]
+    }}
+    width={Dimensions.get("window").width} // from react-native
+    height={220}
+    yAxisInterval={1} // optional, defaults to 1
+    chartConfig={{
+      backgroundColor: "#e26a00",
+      backgroundGradientFrom: "#fb8c00",
+      backgroundGradientTo: "#ffa726",
+      decimalPlaces: 2, // optional, defaults to 2dp
+      color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      style: {
+        borderRadius: 16
+      },
+      propsForDots: {
+        r: "6",
+        strokeWidth: "2",
+        stroke: "#ffa726"
+      }
+    }}
+    bezier
+    style={{
+      marginVertical: 8,
+      borderRadius: 16
+    }}
+  />
+    </View>
+    
     ) : (
       <View style={{flex: 1, backgroundColor: colors.bottomBackGround,justifyContent:'center'}}>
         <Text style={{color:'grey',fontWeight:'bold',fontFamily:'sans-serif-thin',letterSpacing:5,textAlign:'center',alignSelf:'center'}}>Add Marks to get started</Text>

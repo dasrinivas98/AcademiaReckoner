@@ -1,5 +1,5 @@
-import React,{useEffect,useState} from 'react';
-import {View, Text,TouchableOpacity,Dimensions} from 'react-native';
+import React,{useEffect,useState,BackHandler} from 'react';
+import {View, Text,TouchableOpacity,Dimensions,Alert,NativeModules} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import { TextInput } from 'react-native-paper';
@@ -14,6 +14,7 @@ import {
   StackedBarChart
 } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
+import RNRestart from 'react-native-restart';
 
 export default function UserBio({sem}) {
   const isFocused = useIsFocused();
@@ -75,7 +76,7 @@ export default function UserBio({sem}) {
    
  }
   const getData = async () => {
-    let value
+    //let value
     try {
       nm = await AsyncStorage.getItem('name');
       us = await AsyncStorage.getItem('usn');
@@ -84,7 +85,7 @@ export default function UserBio({sem}) {
     } catch(e) {
       // read error
     }
-    console.log(" crct stored values are 55 "+value);
+    //console.log(" crct stored values are 55 "+value);
     setData({
       ...data,
           name : nm.toUpperCase(),
@@ -96,6 +97,16 @@ export default function UserBio({sem}) {
   }
   
   //console.log(data);
+  const clearData = async() => {
+    NativeModules.DevSettings.reload();
+    try {
+        await AsyncStorage.clear();
+      } catch(e) {
+        console.log(e);
+      }
+      
+      
+  }
   useEffect(() => {
    getData();
     
@@ -104,6 +115,7 @@ export default function UserBio({sem}) {
     <View
       style={{
         marginStart: 10,
+        marginEnd:10,
         marginTop: 20,
       }}>
       {/* <View style={{marginBottom: 5}}>
@@ -212,53 +224,31 @@ export default function UserBio({sem}) {
         </View>
       </View>
     </TouchableOpacity>
+    <TouchableOpacity
+      onPress={clearData}>
+      <View style={{marginTop: 10}}>
+        <View
+          style={{
+            flex: 1,
+            height: 30,
+            borderRadius: 5,
+            marginStart: 10,
+            marginEnd: 10,
+            backgroundColor:"#0088f8",
+            justifyContent: 'center',
+            borderColor: '#262626',
+            borderWidth: 1,
+          }}>
+          <View style={{alignItems: 'center'}}>
+            <Text style={{color: 'white'}}>Clear all the data and signout</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
       {/* <Card>
         <CardTitle title="Name"/>
         <CardContent text={data.name} />
       </Card> */}
-    <LineChart
-    data={{
-      labels: ["January", "February", "March", "April", "May", "June"],
-      datasets: [
-        {
-          data: [
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100
-          ]
-        }
-      ]
-    }}
-    width={Dimensions.get("window").width} // from react-native
-    height={220}
-    yAxisLabel="$"
-    yAxisSuffix="k"
-    yAxisInterval={1} // optional, defaults to 1
-    chartConfig={{
-      backgroundColor: "#e26a00",
-      backgroundGradientFrom: "#fb8c00",
-      backgroundGradientTo: "#ffa726",
-      decimalPlaces: 2, // optional, defaults to 2dp
-      color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-      labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-      style: {
-        borderRadius: 16
-      },
-      propsForDots: {
-        r: "6",
-        strokeWidth: "2",
-        stroke: "#ffa726"
-      }
-    }}
-    bezier
-    style={{
-      marginVertical: 8,
-      borderRadius: 16
-    }}
-  />
     </View>
   );
 }
