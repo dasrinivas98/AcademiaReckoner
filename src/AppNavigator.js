@@ -24,8 +24,35 @@ StatusBar.setBarStyle('light-content');
 
 export default function AppNavigator() {
   const [validate, setValidate] = React.useState(false); 
+  const [init, setInit] = React.useState(true); 
   // const [username,setUserName] = useState('');
   // const [password,setPassword] = useState('');
+  useEffect(() => {
+    getData(); 
+   }, []);
+   const getData = async() =>{
+    try {
+      nm = await AsyncStorage.getItem('name');
+      if(nm != null){
+        setInit(false);
+        setValidate(true);
+      }else{
+        setInit(false);
+      }
+    } catch(e) {
+      // read error
+    }
+    
+   }
+   function loadScreeen(){
+     return(
+     <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#FFFFFF'}}>
+        <View>
+            <Image source={images.logo} style={{height: 70, width: 210}} />
+          </View>
+     </View>
+     )
+   }
   function LoginScreen() {
     const _signInAsync = async () => {
       setValidate(true);
@@ -172,7 +199,7 @@ export default function AppNavigator() {
     <Stack.Navigator>
       <Stack.Screen
         name="Login"
-        component={LoginScreen}
+        component={init ? loadScreeen : LoginScreen}
         options={{
           headerStyle: {backgroundColor: '#000'},
           headerTintColor: '#fff',
