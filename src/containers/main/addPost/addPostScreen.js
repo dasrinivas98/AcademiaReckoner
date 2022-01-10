@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {View, Text, Button,TouchableOpacity,ScrollView} from 'react-native';
+import {View, Text, Button,TouchableOpacity,ScrollView,Alert} from 'react-native';
 import palette from 'res/palette';
 import colors from 'res/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -18,8 +18,14 @@ export default function addPostScreen({navigation}) {
   const [textInput,setTextInput] = useState([]);
   const [marks,setMarks] = useState(0);
   const [sub,setSub] = useState("");
+  const [subErr,setSubErr] = useState(null);
+  const [creditsErr,setCreditsErr] = useState(null);
+  const [marksErr,setMarksErr]= useState(null);
+  const [semErr,setSemError] = useState(null);
+  const [subCountErr,setSubCountErr] = useState(null);
   //const [userInputs,setUserInputs] = useState([{"sub":"","marks":0,"credits":0}]);
-  const [userInputs,setUserInputs] = useState([{"sub":"","marks":0,"credits":0}]);
+  const [userInputs,setUserInputs] = useState([{"sub":'',"marks":0,"credits":0}]);
+  const [userInputErr,setUserInputErr] = useState([{"sub":null,"marks":null,"credits":null}]);
   const [items, setItems] = useState([
     {label: 1, value: "1"},
     {label: 2, value: "2"},
@@ -31,21 +37,21 @@ export default function addPostScreen({navigation}) {
     {label: 8, value: "8"},
 
   ]);
-  updateState = (index,k,value) => {
+//   updateState = (index,k,value) => {
     
-    const dt = [{"sem":index+1,"sub":value,"marks":k}]
-    console.log()
-    // console.log(k);
-    //const Textdata = userInputs; 
-    // let  dt = {index:{k:value}}
-    // console.log(dt);
-    //onChangeText={(text) => {setData({...data,usn:text})}}//make a copy of array
-    //setUserInputs([{...data,key:value}]);
-    //Textdata[index] = {key:value};
-    //setUserInputs({...userInputs,"sub":value,"marks":0});
-    // setUserInputs(Textdata);
-    console.log(dt);
- }
+//     const dt = [{"sem":index+1,"sub":value,"marks":k}]
+//     console.log()
+//     // console.log(k);
+//     //const Textdata = userInputs; 
+//     // let  dt = {index:{k:value}}
+//     // console.log(dt);
+//     //onChangeText={(text) => {setData({...data,usn:text})}}//make a copy of array
+//     //setUserInputs([{...data,key:value}]);
+//     //Textdata[index] = {key:value};
+//     //setUserInputs({...userInputs,"sub":value,"marks":0});
+//     // setUserInputs(Textdata);
+//     console.log(dt);
+//  }
  const updateMarks = (index, value) => {
   userInputs[index] = {...userInputs[index], ['marks']: value};
   //setUserInputs({...userInputs[index],userInputs[index].marks: value});
@@ -78,44 +84,72 @@ const updateCredits = (index, value) => {
 }
   const toggleModal = () => {
     let textInput1 = [];
-    for(let i=0;i<subCount;i++){
-      textInput1.push(<View style={{marginBottom: 5}}key={i}>
-      <Text style={{color: 'white'}}>Subject {i+1}</Text>
-        <TextInput
-        mode='flat'
-        style={{backgroundColor: 'black'}}
-        activeOutlineColor='white'
-        activeUnderlineColor = 'white'
-        outlineColor = 'white'
-        //underlineColor = 'white'
-        onChangeText={val => updateSubject(i, val)}
-        selectionColor = 'white'
-        theme={{colors: { text: 'white',placeholder: "white" }}}
-      />
-      <Text style={{color: 'white',marginTop:10}}>Credits Assigned</Text>
-      <NumericInput
-        totalWidth={240} 
-        totalHeight={50}
-          onChange={value => updateCredits(i,value)} 
-          rounded textColor='#59656F' iconStyle={{ color: '#59656F' }} rightButtonBackgroundColor='#292d3e' leftButtonBackgroundColor='#292d3e' minValue={1}
-          maxValue={10}/>
-      <Text style={{color: 'white',marginTop:10}}>Marks Obtained</Text>
-        <TextInput
-        mode='flat'
-        keyboardType='numeric'
-        style={{backgroundColor: 'black'}}
-        activeOutlineColor='white'
-        activeUnderlineColor = 'white'
-        outlineColor = 'white'
-        //underlineColor = 'white'
-        onChangeText={val => updateMarks(i,val)}
-        selectionColor = 'white'
-        theme={{ colors: { text: 'white',placeholder: "white" } }}
-      />
-    </View>);
+    console.log("semester and sub count in addpost: "+subCount,value)
+    if(subCount == 0 || value == 0){
+      (subCount == 0) ? setSubCountErr("Select total number of subjects") :  setSubCountErr(null);
+      (value == 0) ? setSemError("Select Sem") :  setSemError(null);
+    }else{
+      setSemError(null);
+      setSubCountErr(null);
+      for(let i=0;i<subCount;i++){
+        userInputs[i] = {...userInputs[i], ['sub']: '',['marks']:0,['credits']:0}
+        userInputErr[i] = {...userInputs[i], ['sub']: null,['marks']:null,['credits']:null}
+        console.log("index:"+i)
+        textInput1.push(<View style={{marginBottom: 5}}key={i}>
+        <Text style={{color: 'white'}}>Subject {i+1}</Text>
+          <TextInput
+          mode='flat'
+          style={{backgroundColor: 'black'}}
+          activeOutlineColor='white'
+          activeUnderlineColor = 'white'
+          outlineColor = 'white'
+          //underlineColor = 'white'
+          onChangeText={val => updateSubject(i, val)}
+          selectionColor = 'white'
+          theme={{colors: { text: 'white',placeholder: "white" }}}
+        />
+        {
+        console.log(userInputErr[i].sub),
+        !!userInputErr[i].sub && (
+            <Text style={{color: 'red'}}>
+              {userInputErr[i].sub}
+            </Text>
+          )}
+        <Text style={{color: 'white',marginTop:10}}>Credits Assigned</Text>
+        <NumericInput
+          totalWidth={240} 
+          totalHeight={50}
+            onChange={value => updateCredits(i,value)} 
+            rounded textColor='#59656F' iconStyle={{ color: '#59656F' }} rightButtonBackgroundColor='#292d3e' leftButtonBackgroundColor='#292d3e' minValue={1}
+            maxValue={10}/>
+            {!!userInputErr[i].credits && (
+            <Text style={{color: 'red'}}>
+              {userInputErr[i].credits}
+            </Text>
+          )}
+        <Text style={{color: 'white',marginTop:10}}>Marks Obtained</Text>
+          <TextInput
+          mode='flat'
+          keyboardType='numeric'
+          style={{backgroundColor: 'black'}}
+          activeOutlineColor='white'
+          activeUnderlineColor = 'white'
+          outlineColor = 'white'
+          //underlineColor = 'white'
+          onChangeText={val => updateMarks(i,val)}
+          selectionColor = 'white'
+          theme={{ colors: { text: 'white',placeholder: "white" } }}
+        />
+        {!userInputErr[i].marks && (
+            <Text style={{color: 'red'}}>
+              {userInputErr[i].marks}
+            </Text>
+          )}
+      </View>);
+      }
+      setTextInput(textInput1);
+      setModalVisible(!isModalVisible);
     }
-    setTextInput(textInput1);
-    setModalVisible(!isModalVisible);
   };
   const getGradePoint = (marks) =>{
     if(marks>=0 && marks<50){
@@ -136,63 +170,144 @@ const updateCredits = (index, value) => {
 
   }
   const saveMarks = async () => {
-    console.log(value);
-    console.log(userInputs);
-  try {
-    const jsonValue = JSON.stringify(userInputs)
-    await AsyncStorage.setItem(value, jsonValue)
-    Toast.show("Saved successfully");
-    navigation.navigate('Home');
-  } catch(e) {
-    console.log(e);
-    Toast.show("Failed to save");
-  }
-  
-  let va
+    //console.log(value);
+ var err = false
+    console.log("marks input in  add post :"+userInputs);
+    userInputs.map((st,index) => {
+      console.log(st.sub,index);
+      (st.sub.trim() == "") ? (err = true) : (err == false ? false : true);
+      (!st.credits) ? err = true : (err == false ? false : true);
+      (!st.marks) ? err = true : (err == false ? false : true);
+    });
+    if(err){
+      Alert.alert(
+        "Add marks",
+        "Please enter all the details",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+        ],
+        {
+          cancelable: false,
+        }
+      );
+    }else{
       try {
-        va = await AsyncStorage.getItem('5');
-        let arrayData = JSON.parse(va);
-        console.log(va);
+        const jsonValue = JSON.stringify(userInputs)
+        await AsyncStorage.setItem(value, jsonValue)
+        Toast.show("Saved successfully");
+        navigation.navigate('Home');
+      } catch(e) {
+        console.log(e);
+        Toast.show("Failed to save");
+      }
+      
+      let va
+          try {
+            va = await AsyncStorage.getItem('5');
+            let arrayData = JSON.parse(va);
+            console.log(va);
+          } catch(e) {
+            console.log(e);
+          }
+          console.log("stored values are "+va);
+          setModalVisible(!isModalVisible);
+          console.log('Saved succesfully'); 
+          let keys = []
+      try {
+        keys = await AsyncStorage.getAllKeys();
+        console.log(keys)
       } catch(e) {
         console.log(e);
       }
-      console.log("stored values are "+va);
-      setModalVisible(!isModalVisible);
-      console.log('Saved succesfully'); 
-      let keys = []
-  try {
-    keys = await AsyncStorage.getAllKeys();
-    console.log(keys)
-  } catch(e) {
-    console.log(e);
-  }
-  let valu = []
-  try {
-    valu = await AsyncStorage.multiGet(keys);
-  } catch(e) {
-    // read error
-  }
-  console.log((valu))
-  vf = valu[0].map(req => JSON.parse(req));
-  let sum = 0;
-  //console.log(vf[1][0].marks);
-  // sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
-  // console.log("Total marks is :"+sum);
-  const totalMarks = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
-  const totalCredits = vf[1].reduce((prev,next) => prev + parseInt(next.credits),0);
-  const totalCP = vf[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
-  console.log("Total marks in addpost screen is :"+totalMarks);
-  console.log("Total credits in addpost screen is :"+totalCredits);
-  console.log("Total CP in addpost screen is :"+totalCP);
-  console.log("CGPA in addpost screen is :"+(totalCP/totalCredits).toFixed(2));
-  //console.log("CGPA in addpost screen is :"+(((totalMarks/vf[1].length)+0.75)/10.0));
+      let valu = []
+      try {
+        valu = await AsyncStorage.multiGet(keys);
+      } catch(e) {
+        // read error
+      }
+      console.log((valu))
+      let vf = []
+      vf = valu[0].map(req => JSON.parse(req));
+      let sum = 0;
+      //console.log(vf[1][0].marks);
+      // sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
+      // console.log("Total marks is :"+sum);
+      const totalMarks = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
+      const totalCredits = vf[1].reduce((prev,next) => prev + parseInt(next.credits),0);
+      const totalCP = vf[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
+      console.log("Total marks in addpost screen is :"+totalMarks);
+      console.log("Total credits in addpost screen is :"+totalCredits);
+      console.log("Total CP in addpost screen is :"+totalCP);
+      console.log("CGPA in addpost screen is :"+(totalCP/totalCredits).toFixed(2));
+      //console.log("CGPA in addpost screen is :"+(((totalMarks/vf[1].length)+0.75)/10.0));
+      // try {
+      //   await AsyncStorage.clear()
+      // } catch(e) {
+      //   console.log(e);
+      // }
+    
+      console.log('Done.')
+
+    }
+    
   // try {
-  //   await AsyncStorage.clear()
+  //   const jsonValue = JSON.stringify(userInputs)
+  //   await AsyncStorage.setItem(value, jsonValue)
+  //   Toast.show("Saved successfully");
+  //   navigation.navigate('Home');
+  // } catch(e) {
+  //   console.log(e);
+  //   Toast.show("Failed to save");
+  // }
+  
+  // let va
+  //     try {
+  //       va = await AsyncStorage.getItem('5');
+  //       let arrayData = JSON.parse(va);
+  //       console.log(va);
+  //     } catch(e) {
+  //       console.log(e);
+  //     }
+  //     console.log("stored values are "+va);
+  //     setModalVisible(!isModalVisible);
+  //     console.log('Saved succesfully'); 
+  //     let keys = []
+  // try {
+  //   keys = await AsyncStorage.getAllKeys();
+  //   console.log(keys)
   // } catch(e) {
   //   console.log(e);
   // }
+  // let valu = []
+  // try {
+  //   valu = await AsyncStorage.multiGet(keys);
+  // } catch(e) {
+  //   // read error
+  // }
+  // console.log((valu))
+  // vf = valu[0].map(req => JSON.parse(req));
+  // let sum = 0;
+  // //console.log(vf[1][0].marks);
+  // // sum = vf[1].map(mrks => sum+parseInt(mrks.marks));
+  // // console.log("Total marks is :"+sum);
+  // const totalMarks = vf[1].reduce((prev,next) => prev + parseInt(next.marks),0);
+  // const totalCredits = vf[1].reduce((prev,next) => prev + parseInt(next.credits),0);
+  // const totalCP = vf[1].reduce((prev,next) => prev + getGradePoint(parseInt(next.marks))*parseInt(next.credits),0);
+  // console.log("Total marks in addpost screen is :"+totalMarks);
+  // console.log("Total credits in addpost screen is :"+totalCredits);
+  // console.log("Total CP in addpost screen is :"+totalCP);
+  // console.log("CGPA in addpost screen is :"+(totalCP/totalCredits).toFixed(2));
+  // //console.log("CGPA in addpost screen is :"+(((totalMarks/vf[1].length)+0.75)/10.0));
+  // // try {
+  // //   await AsyncStorage.clear()
+  // // } catch(e) {
+  // //   console.log(e);
+  // // }
 
-  console.log('Done.')
+  // console.log('Done.')
 
 }
 
@@ -211,6 +326,11 @@ const updateCredits = (index, value) => {
             setItems={setItems}
             theme="DARK"
           />
+           {!!semErr && (
+            <Text style={{color: 'red'}}>
+              {semErr}
+            </Text>
+          )}
       </View>    
       <View style={{marginBottom: 10,marginStart: 10}}>
         <Text style={{color: 'white',marginBottom: 5}}>Total No. of Subjects</Text>
@@ -219,6 +339,11 @@ const updateCredits = (index, value) => {
         totalHeight={50}
            onChange={value => setSubCount(value)} rounded textColor='#59656F' iconStyle={{ color: '#59656F' }} rightButtonBackgroundColor='#292d3e' leftButtonBackgroundColor='#292d3e' minValue={1}
           maxValue={10}/>
+           {!!subCountErr && (
+            <Text style={{color: 'red'}}>
+              {subCountErr}
+            </Text>
+          )}
       </View>
       <View style={{marginBottom: 10,marginStart: 10}}>
           <TouchableOpacity style={{alignItems: 'center',height: 40,marginTop: 20, backgroundColor: '#0088f8', justifyContent: 'center',

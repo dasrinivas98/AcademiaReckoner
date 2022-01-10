@@ -1,5 +1,5 @@
-import React,{useEffect,useState,BackHandler} from 'react';
-import {View, Text,TouchableOpacity,Dimensions,Alert,NativeModules} from 'react-native';
+import React,{useEffect,useState} from 'react';
+import {View, Text,TouchableOpacity,Dimensions,Alert,NativeModules,BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import { TextInput } from 'react-native-paper';
@@ -113,12 +113,13 @@ export default function UserBio({sem}) {
   
   //console.log(data);
   const clearData = async() => {
-    NativeModules.DevSettings.reload();
+    
     try {
         await AsyncStorage.clear();
       } catch(e) {
         console.log(e);
       }
+      BackHandler.exitApp();
       
       
   }
