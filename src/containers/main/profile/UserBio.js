@@ -14,21 +14,37 @@ import {
   StackedBarChart
 } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
+import { NavigationContainer } from '@react-navigation/native';
 
 export default function UserBio({sem}) {
   const isFocused = useIsFocused();
+  const [usernameError,setUserNameError] = useState(null);
+  const [usnError,setUsnError] = useState(null);
+  const [collegeError,setColegeError] = useState(null);
+  const [uniError,setUniError] = useState(null)
   const [data, setData] = useState({
     name:'',
     usn:'',
     college:'',
-    university:''
+    university:'',
  })
  const [disable, setDisable] = useState(true);
  let  enable = async() =>{
   //setDisable(!disable)
   if(!disable){
     console.log("New values are : "+ data.name + data.college + data.usn + data.university)
-    const name = ["name", data.name]
+    if(!data.usn.trim() || !data.university.trim() || !data.name.trim() || !data.college.trim()){
+      (!data.name.trim()) ? setUserNameError("Name connot be blank") :  setUserNameError(null);
+      (!data.usn.trim()) ? setUsnError("USN connot be blank") :  setUsnError(null);
+      (!data.university.trim()) ? setUniError("University connot be blank") :  setUniError(null);
+      (!data.college.trim()) ? setColegeError("College connot be blank") :  setColegeError(null);
+      return
+    }else{
+      setUserNameError(null);
+      setUsnError(null);
+      setUniError(null);
+      setColegeError(null);
+      const name = ["name", data.name]
       const usn = ["usn", data.usn]
       const college = ["college", data.college]
       const university = ["university", data.university]
@@ -42,7 +58,7 @@ export default function UserBio({sem}) {
         Toast.show('Failed to update details');
         setDisable(!disable)
       }
-    }else{
+    }}else{
       setDisable(!disable)
     }
   
@@ -147,6 +163,11 @@ export default function UserBio({sem}) {
 
        // onChangeText={text => setText(text)}
       />
+      {!!usernameError && (
+            <Text style={{color: 'red'}}>
+              {usernameError}
+            </Text>
+          )}
       </View>
       <View style={{marginBottom: 5}}>
         <Text style={{color: 'white'}}>USN</Text>
@@ -165,6 +186,11 @@ export default function UserBio({sem}) {
         theme={{ colors: { text: 'white',placeholder: "white" } }}
        // onChangeText={text => setText(text)}
       />
+       {!!usnError && (
+            <Text style={{color: 'red'}}>
+              {usnError}
+            </Text>
+          )}
       </View>
       <View style={{marginBottom: 5}}>
         <Text style={{color: 'white'}}>College</Text>
@@ -183,6 +209,11 @@ export default function UserBio({sem}) {
         theme={{ colors: { text: 'white',placeholder: "white" } }}
        // onChangeText={text => setText(text)}
       />
+      {!!collegeError && (
+            <Text style={{color: 'red'}}>
+              {collegeError}
+            </Text>
+          )}
       </View>
       <View style={{marginBottom: 5}}>
         <Text style={{color: 'white'}}>University</Text>
@@ -201,6 +232,11 @@ export default function UserBio({sem}) {
         theme={{ colors: { text: 'white',placeholder: "white" } }}
        // onChangeText={text => setText(text)}
       />
+       {!!uniError && (
+            <Text style={{color: 'red'}}>
+              {uniError}
+            </Text>
+          )}
       </View>
       <TouchableOpacity
       onPress={enable}>

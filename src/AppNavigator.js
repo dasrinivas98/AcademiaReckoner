@@ -22,11 +22,19 @@ import { Icon } from 'react-native-elements';
 import { Button } from 'react-native-elements';
 StatusBar.setBarStyle('light-content');
 
+var usn = '';
+var username = '';
+var college = '';
+var university = '';
 export default function AppNavigator() {
   const [validate, setValidate] = React.useState(false); 
   const [init, setInit] = React.useState(true); 
+ 
+  
+
   // const [username,setUserName] = useState('');
   // const [password,setPassword] = useState('');
+  
   useEffect(() => {
     getData(); 
    }, []);
@@ -54,22 +62,34 @@ export default function AppNavigator() {
      )
    }
   function LoginScreen() {
+    const [username,setUserName] = useState('');
+    const [usn,setUsn] = useState('');
+    const [college,setCollege] = useState('');
+    const [university,setUniversity] = useState('');
+    const [usernameError,setUserNameError] = useState(null);
+    const [usnError,setUsnError] = useState(null);
+    const [collegeError,setColegeError] = useState(null);
+    const [uniError,setUniError] = useState(null)
     const _signInAsync = async () => {
-      setValidate(true);
-      console.log(this.usn)
-      console.log(this.username)
-      console.log(this.college)
-      console.log(this.university)
-      const name = ["name", this.username]
-      const usn = ["usn", this.usn]
-      const college = ["college", this.college]
-      const university = ["university", this.university]
-      console.log(this.usn)
+      if(!usn.trim() || !university.trim() || !username.trim() || !college.trim()){
+        (!username.trim()) ? setUserNameError("Name required") :  setUserNameError(null);
+        (!usn.trim()) ? setUsnError("USN required") :  setUsnError(null);
+        (!university.trim()) ? setUniError("University required") :  setUniError(null);
+        (!college.trim()) ? setColegeError("College required") :  setColegeError(null);
+        return
+      }else{
+        console.log(usn,username)
+      const NAME = ["name", username]
+      const USN = ["usn", usn]
+      const COL = ["college", college]
+      const UNI = ["university", university]
+      console.log(usn)
       try {
-        await AsyncStorage.multiSet([name, usn,college,university])
+        await AsyncStorage.multiSet([NAME,USN,COL,UNI]);
       } catch(e) {
         console.log("unable to save"+e)
       }
+      setValidate(true);
       let values
       try {
         values = await AsyncStorage.multiGet(['name', 'usn', 'college', 'university'])
@@ -85,7 +105,7 @@ export default function AppNavigator() {
       // }
 
       // console.log('removed')
-    };
+    }};
     return (
       <ScrollView>
         <View style={Styles.container}>
@@ -99,32 +119,52 @@ export default function AppNavigator() {
               style={Styles.userNameInput}
               placeholder="Name"
               placeholderTextColor={colors.textFaded2}
-              onChangeText={(text) => this.username = text}
+              onChangeText={(text) => setUserName(text)}
             />
+            {!!usernameError && (
+            <Text style={{color: 'red'}}>
+              {usernameError}
+            </Text>
+          )}
           </View>
           <View style={Styles.passwordContainer}>
             <TextInput
               style={Styles.userNameInput}
               placeholder="USN"
               placeholderTextColor={colors.textFaded2}
-              onChangeText={(text) => this.usn = text}
+              onChangeText={(text) => setUsn(text)}
             />
+            {!!usnError && (
+            <Text style={{color: 'red'}}>
+              {usnError}
+            </Text>
+          )}
           </View>
           <View style={Styles.passwordContainer}>
             <TextInput
               style={Styles.userNameInput}
               placeholder="College"
               placeholderTextColor={colors.textFaded2}
-              onChangeText={(text) => this.college = text}
+              onChangeText={(text) => setCollege(text)}
             />
+            {!!collegeError && (
+            <Text style={{color: 'red'}}>
+              {collegeError}
+            </Text>
+          )}
           </View>
           <View style={Styles.passwordContainer}>
             <TextInput
               style={Styles.userNameInput}
               placeholder="University"
               placeholderTextColor={colors.textFaded2}
-              onChangeText={(text) => this.university = text}
+              onChangeText={(text) => setUniversity(text)}
             />
+            {!!uniError && (
+            <Text style={{color: 'red'}}>
+              {uniError}
+            </Text>
+          )}
           </View>
           
           {/* <View style={Styles.forgotPasswordContainer}>
@@ -238,7 +278,6 @@ const Styles = StyleSheet.create({
     
   },
   userNameInput: {
-    marginStart: 10,
     color: 'black',
     borderBottomColor: '#000',
     borderBottomWidth: 1
